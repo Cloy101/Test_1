@@ -12,10 +12,11 @@ const bool test = true;
 #include <iostream>
 #include <exception>
 #include "libpq-fe.h"
-#include <nlohmann/json.hpp>
+#include <string>
+//#include <nlohmann/json.hpp>
 
 
-using json = nlohmann::json;
+//using json = nlohmann::json;
 
 void exit_nicely(PGconn* conn)
 {
@@ -23,16 +24,48 @@ void exit_nicely(PGconn* conn)
     exit(1);
 }
 
+std::string readFile(const std::string& fileName)
+{
+    return std::string((std::istreambuf_iterator<char>(std::ifstream(fileName))), std::istreambuf_iterator<char>());
+}
+
+size_t findWord(std::string text, std::string word)
+{
+   return text.find(word) + word.length() + 3;
+}
+
+std::string copyWord(std::string text, std::string word)
+{
+    size_t start = findWord(text, word);
+    if (text.at(start) == '\"')
+    {
+        start += 1;
+    }
+
+    std::string temp;
+
+    while (text.at(start) != ',' && text.at(start) != '\"')
+    {
+        temp += text.at(start);
+        ++start;
+    }
+    return temp;
+}
+
 int main(int argc, char** argv)
 {
     // 1.1. Read the file .json with library nlomahmann_json
-    json data;
+    //json data;
+    std::string fileName = "config.json";
     
+    std::string dataString;
     try
     {
-        std::ifstream config("config.json");
-        config >> data;
-        config.close();
+        //std::ifstream config(fileName);
+        //config >> data;
+
+        dataString = readFile(fileName);
+        //config.close();
     }
 
     catch (const std::exception& e)
@@ -40,9 +73,23 @@ int main(int argc, char** argv)
         std::cerr << "ERROR::The file config.json is unavailable" << e.what() << std::endl;
     }
 
+    std::string pqHost = copyWord(dataString,"host");
+
+    if (test)
+    {
+        pqHost = "localhost";
+    }
+
+    std::string pqPort = copyWord(dataString, "port");
+    std::string pqDatabase = copyWord(dataString, "database");
+    std::string pqUser = copyWord(dataString, "user");
+    std::string pqPass = copyWord(dataString, "pass");
+
+   /*
     std::string pqDb = data["db"];
     
-    std::string pqHost;
+   
+   std::string pqHost;
     if (test)
     {
         pqHost = "localhost";
@@ -55,13 +102,22 @@ int main(int argc, char** argv)
     std::string pqDatabase = data["connection"]["database"];
     std::string pqUser = data["connection"]["user"];
     std::string pqPass = data["connection"]["pass"];
+    
 
-    // 2.1 Create the connection to the PostgreSQL data base
-   const std::string connInfo = "host=" + pqHost +
+     2.1 Create the connection to the PostgreSQL data base
+   
+    const std::string connInfo = "host=" + pqHost +
                             " port=" + std::to_string(jPort) +
                             " dbname=" + pqDatabase +
                             " user=" + pqUser +
                             " password=" + pqPass;
+    */
+
+   const std::string connInfo = "host=" + pqHost +
+       " port=" + pqPort +
+       " dbname=" + pqDatabase +
+       " user=" + pqUser +
+       " password=" + pqPass;
 
     PGconn* conn = PQconnectdb(connInfo.c_str());
     if (PQstatus(conn) != CONNECTION_OK)
