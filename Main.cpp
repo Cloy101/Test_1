@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 
     if (out.is_open())
     {
-        std::string temp = "{\n\"db\": \"" + pqDb + "\",\n";
+        std::string temp = "{\n\"db\": \"" + pqDb + "\",\n\"tables\":{\n";
         out << temp;
 
         res = PQexec(conn, "SELECT tablename FROM pg_tables WHERE schemaname = 'public';");
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
 
                 }   else
                     {
-                        out << '\n' << '}';
+                        out << '\n' << '}' << '\n' << '}';
                     }
             }   else
                 {
