@@ -25,7 +25,7 @@ std::string readFile(const std::string& fileName)
     std::ifstream file(fileName);
     std::string temp;
     temp.assign((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    return temp; //std::string((std::istreambuf_iterator<char>(std::ifstream(fileName))), std::istreambuf_iterator<char>());
+    return temp;
 }
 
 size_t findWord(std::string text, std::string word)
@@ -70,10 +70,11 @@ int main(int argc, char** argv)
 
     std::string pqHost = copyWord(dataString,"host");
 
-    if (test)
-    {
-        pqHost = "localhost";
-    }
+    // the hostname for test runs with debug configuration
+    //if (test)
+    //{
+    //    pqHost = "localhost";
+    //}
     
     //2.1 Make the connection
     std::string pqDb = copyWord(dataString, "db");
