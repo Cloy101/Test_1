@@ -22,7 +22,10 @@ void exit_nicely(PGconn* conn)
 
 std::string readFile(const std::string& fileName)
 {
-    return std::string((std::istreambuf_iterator<char>(std::ifstream(fileName))), std::istreambuf_iterator<char>());
+    std::ifstream file(fileName);
+    std::string temp;
+    temp.assign((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    return temp; //std::string((std::istreambuf_iterator<char>(std::ifstream(fileName))), std::istreambuf_iterator<char>());
 }
 
 size_t findWord(std::string text, std::string word)
@@ -51,12 +54,13 @@ std::string copyWord(std::string text, std::string word)
 int main(int argc, char** argv)
 {
     // 1.1. Read the file .json with library nlomahmann_json
-    std::string fileName = "config.json";
+    const std::string fileName = "config.json";
     std::string dataString;
     
     try
     {
-        dataString = readFile(fileName);
+        std::string temp = readFile(fileName);
+        dataString = std::move(temp);
     }
 
     catch (const std::exception& e)
